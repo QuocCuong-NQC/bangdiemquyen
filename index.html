@@ -3,122 +3,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bảng Điểm Quyền (Poomsae)</title>
+    <title>Bảng Điểm Quyền Vovinam (Admin Toàn Quyền)</title>
     <!-- Tải Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Liên kết đến file CSS tùy chỉnh -->
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-</head>
-<body class="p-4 md:p-8">
-    <div id="appContainer" class="flex flex-col md:flex-row min-h-screen">
+    <!-- Tải Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Roboto+Mono:wght@100..700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Tùy Chỉnh dựa trên phiên bản trước */
+        :root {
+            --score-bg: #374151; /* gray-700 */
+            --score-main: #111827; /* gray-900 (rất đậm) */
+        }
+        body {
+            font-family: 'Oswald', sans-serif;
+            background-color: #111827;
+            color: #F9FAFB;
+        }
+        .label-control {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #D1D5DB;
+        }
+        .input-control {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background-color: #4B5563;
+            border: 1px solid #6B7280;
+            color: white;
+            font-family: 'Roboto Mono', monospace;
+            transition: border-color 0.2s;
+        }
+        .btn-control {
+            padding: 8px 12px;
+            border-radius: 8px; 
+            font-weight: 700;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .btn-control:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+        }
+        .btn-form {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
 
-        <!-- Màn hình Giao Diện Hiển Thị (Scoreboard Display) -->
-        <section id="displaySection" class="w-full md:w-3/4 p-2 md:p-6 flex flex-col items-center justify-center">
+        /* KHUNG ĐIỂM CHÍNH */
+        .score-box {
+            background-color: var(--score-bg);
+            border: 6px solid #FBBF24;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+        }
+        .total-score {
+            background-color: var(--score-main);
+            flex-grow: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10vw;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+            letter-spacing: -2px;
+            font-family: 'Roboto Mono', monospace; 
+        }
+        .judge-scores {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-top: 4px solid #FBBF24;
+        }
+        .judge-score-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 4vw;
+            font-weight: 700;
+            padding: 10px 0;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .judge-score-cell:not(:last-child) {
+            border-right: 2px solid rgba(255,255,255,0.1);
+        }
+        .judge-label {
+            font-size: 1.5vw;
+            font-weight: 400;
+            color: #D1D5DB;
+            margin-top: 5px;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        /* Responsive cho thiết bị di động */
+        @media (max-width: 1024px) {
+            #appContainer {
+                flex-direction: column-reverse; /* Đưa Control Panel lên trên Display Screen */
+            }
+            .total-score {
+                font-size: 18vw;
+            }
+            .judge-score-cell {
+                font-size: 8vw;
+            }
+            .judge-label {
+                font-size: 3vw;
+            }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6 bg-gray-900 min-h-screen">
+    <div id="appContainer" class="flex flex-col lg:flex-row min-h-[95vh] gap-4">
+
+        <!-- A. Bảng Điều Khiển (Admin Panel) -->
+        <section id="controlPanel" class="w-full lg:w-1/4 p-4 md:p-6 bg-gray-700 rounded-xl shadow-xl space-y-6 order-2 lg:order-1">
+            <h3 class="text-3xl font-bold text-center text-white border-b pb-3 border-gray-600">
+                Điều Khiển <span class="text-sm font-mono block mt-1 text-yellow-300">ADMIN TOÀN QUYỀN</span>
+            </h3>
+
+            <!-- 1. Cấu hình Chung -->
+            <div id="adminConfig" class="space-y-4 border-b border-gray-600 pb-4">
+                <h4 class="text-xl font-semibold text-green-300">Cấu hình Trận Đấu</h4>
+                
+                <div class="space-y-2">
+                    <label for="tournamentName" class="label-control">Tên Giải Đấu:</label>
+                    <input type="text" id="tournamentName" class="input-control" placeholder="Giải Vovinam Quốc gia">
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="athleteNameInput" class="label-control">Tên VĐV:</label>
+                    <input type="text" id="athleteNameInput" class="input-control" placeholder="NGUYỄN VĂN A">
+                </div>
+
+                <!-- Chọn Nội Dung Quyền -->
+                <div>
+                    <label class="label-control">Chọn Nội Dung:</label>
+                    <div class="flex space-x-2 mt-1">
+                        <button id="btnKhoiQuyen" data-form="Khởi Quyền" class="btn-form w-full bg-green-600 text-white hover:bg-green-700">Khởi Quyền</button>
+                        <button id="btnThapTuQuyen" data-form="Thập Tự Quyền" class="btn-form w-full bg-gray-500 text-white hover:bg-gray-600">Thập Tự Quyền</button>
+                    </div>
+                </div>
+
+                <button id="btnReset" class="btn-control w-full bg-red-600 text-white hover:bg-red-700">RESET TOÀN BỘ ĐIỂM</button>
+            </div>
+
+            <!-- 2. Các Ô Chấm Điểm (Admin nhập cho tất cả) -->
+            <div class="space-y-4">
+                <h4 class="text-xl font-semibold text-green-300">Nhập Điểm Giám Định (79-100)</h4>
+                
+                <!-- GĐ 1 -->
+                <div class="judge-control-box" data-judge-id="1">
+                    <label for="gd1Input" class="label-control">Điểm GĐ 1:</label>
+                    <div class="flex space-x-2 mt-1">
+                        <input type="number" id="gd1Input" min="79" max="100" class="input-control w-2/3" placeholder="85">
+                        <button data-judge="1" class="btn-control btn-submit w-1/3 bg-blue-600 text-white hover:bg-blue-700">GỬI GĐ1</button>
+                    </div>
+                </div>
+
+                <!-- GĐ 2 -->
+                <div class="judge-control-box" data-judge-id="2">
+                    <label for="gd2Input" class="label-control">Điểm GĐ 2:</label>
+                    <div class="flex space-x-2 mt-1">
+                        <input type="number" id="gd2Input" min="79" max="100" class="input-control w-2/3" placeholder="90">
+                        <button data-judge="2" class="btn-control btn-submit w-1/3 bg-blue-600 text-white hover:bg-blue-700">GỬI GĐ2</button>
+                    </div>
+                </div>
+
+                <!-- GĐ 3 -->
+                <div class="judge-control-box" data-judge-id="3">
+                    <label for="gd3Input" class="label-control">Điểm GĐ 3:</label>
+                    <div class="flex space-x-2 mt-1">
+                        <input type="number" id="gd3Input" min="79" max="100" class="input-control w-2/3" placeholder="95">
+                        <button data-judge="3" class="btn-control btn-submit w-1/3 bg-blue-600 text-white hover:bg-blue-700">GỬI GĐ3</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-600 text-xs text-gray-400">
+                <p>App ID: <span id="appIdDisplay" class="font-mono text-xs">Loading...</span></p>
+            </div>
             
-            <!-- Tên Giải và Nội Dung -->
-            <div class="text-center mb-6">
-                <h1 id="eventTitle" class="text-4xl md:text-6xl font-extrabold text-yellow-400">GIẢI IPES MỞ RỘNG NĂM 2025</h1>
-                <p id="formNameDisplay" class="text-2xl md:text-4xl font-semibold text-gray-300 mt-2">Nội Dung: KHỞI QUYỀN</p>
+        </section>
+
+
+        <!-- B. Màn hình Giao Diện Hiển Thị (Bảng Điểm) -->
+        <section id="displaySection" class="w-full lg:w-3/4 p-4 md:p-8 flex flex-col items-center bg-gray-800 rounded-xl shadow-2xl relative order-1 lg:order-2">
+            
+            <!-- Thông tin Trận Đấu -->
+            <div class="text-center mb-6 w-full">
+                <h1 id="eventTitle" class="text-4xl md:text-5xl font-extrabold text-yellow-400 uppercase">TÊN GIẢI ĐẤU</h1>
+                <p id="formNameDisplay" class="text-xl md:text-3xl font-semibold text-gray-300 mt-2">Nội Dung: Đang Cập Nhật</p>
             </div>
 
             <!-- Tên Vận Động Viên -->
-            <div class="w-full text-center my-8">
-                <h2 id="athleteNameDisplay" class="text-6xl md:text-8xl font-black uppercase text-white bg-red-600 p-4 rounded-xl shadow-2xl">
-                    NGUYỄN VĂN A
+            <div class="w-full text-center my-6">
+                <h2 id="athleteNameDisplay" class="text-5xl md:text-7xl font-black uppercase text-white bg-red-600 p-4 rounded-xl shadow-red-900/50 transition-all duration-300">
+                    TÊN VĐV
                 </h2>
             </div>
 
-            <!-- Khung Điểm -->
-            <div class="w-full max-w-4xl aspect-[4/3] score-box rounded-2xl overflow-hidden">
+            <!-- Khung Điểm Chính -->
+            <div class="w-full max-w-5xl aspect-[4/3] score-box rounded-3xl overflow-hidden mt-6">
                 
-                <!-- Điểm Tổng (2/3) -->
+                <!-- Điểm Tổng -->
                 <div class="total-score">
-                    <span id="totalScoreDisplay" class="text-green-400">0.00</span>
+                    <span id="totalScoreDisplay" class="text-green-400">--</span>
                 </div>
                 
-                <!-- Điểm Giám Định (1/3) -->
+                <!-- Điểm Giám Định -->
                 <div class="judge-scores">
                     <div class="judge-score-cell">
-                        <span id="gd1ScoreDisplay">0.00</span>
+                        <span id="gd1ScoreDisplay">--</span>
                         <span class="judge-label">Giám định 1</span>
                     </div>
                     <div class="judge-score-cell">
-                        <span id="gd2ScoreDisplay">0.00</span>
+                        <span id="gd2ScoreDisplay">--</span>
                         <span class="judge-label">Giám định 2</span>
                     </div>
                     <div class="judge-score-cell">
-                        <span id="gd3ScoreDisplay">0.00</span>
+                        <span id="gd3ScoreDisplay">--</span>
                         <span class="judge-label">Giám định 3</span>
                     </div>
                 </div>
             </div>
+
+            <!-- Nút Toàn màn hình -->
+            <button id="btnFullscreenControl" class="mt-6 px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-xl hover:bg-indigo-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a1 1 0 011-1h3a1 1 0 110 2H5v2a1 1 0 11-2 0V5zm7 0a1 1 0 011-1h3a1 1 0 110 2h-2v2a1 1 0 11-2 0V5zm1-1a1 1 0 100-2H7a1 1 0 00-1 1v3a1 1 0 102 0V6h2a1 1 0 000-2zm0 14a1 1 0 001-1v-3a1 1 0 10-2 0v2h-2a1 1 0 110 2h3zm-8 0a1 1 0 01-1-1v-3a1 1 0 112 0v2h2a1 1 0 110 2H4zm14-14a1 1 0 01-1 1h-3a1 1 0 110-2h2V4a1 1 0 112 0v3z"/></svg>
+                CHUYỂN TOÀN MÀN HÌNH
+            </button>
             
-            <button id="btnFullscreenControl" class="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg">Toàn Màn Hình</button>
-
-        </section>
-
-        <!-- Bảng Điều Khiển Admin (Control Panel) -->
-        <section class="w-full md:w-1/4 admin-section p-4 space-y-6 rounded-lg shadow-xl">
-            <h2 class="text-2xl font-bold border-b pb-2 border-gray-500">Bảng Điều Khiển (Quyền)</h2>
-
-            <!-- 1. Cấu Hình Chung -->
-            <div class="space-y-3">
-                <label class="block font-medium">Tên Giải:</label>
-                <input id="tournamentName" type="text" class="w-full p-2 rounded bg-gray-600 border border-gray-500 text-white" value="GIẢI IPES MỞ RỘNG NĂM 2025">
-                
-                <label class="block font-medium">Tên Vận Động Viên:</label>
-                <input id="athleteNameInput" type="text" class="w-full p-2 rounded bg-gray-600 border border-gray-500 text-white" value="NGUYỄN VĂN A">
-                
-                <label class="block font-medium">Nội Dung Thi Đấu:</label>
-                <div class="flex space-x-2">
-                    <button id="btnKhoiQuyen" class="admin-button flex-1 bg-green-600 text-white active-form-btn" data-form="Khởi Quyền">Khởi Quyền</button>
-                    <button id="btnThapTuQuyen" class="admin-button flex-1 bg-gray-500 text-white" data-form="Thập Tự Quyền">Thập Tự Quyền</button>
-                </div>
-            </div>
-
-            <!-- 2. Nhập Điểm Giám Định -->
-            <div class="space-y-4 pt-4 border-t border-gray-500">
-                <h3 class="text-xl font-semibold">Nhập Điểm (7.90 - 9.00)</h3>
-                
-                <!-- GĐ1 -->
-                <div class="flex items-center space-x-2">
-                    <label class="w-1/3">Giám định 1:</label>
-                    <input id="gd1Input" type="number" step="0.01" min="7.90" max="9.00" class="w-1/3 p-2 rounded bg-gray-600 text-lg font-bold text-yellow-300" placeholder="8.50">
-                    <button class="w-1/3 admin-button bg-red-600 text-white" data-judge="1">UP GĐ1</button>
-                </div>
-
-                <!-- GĐ2 -->
-                <div class="flex items-center space-x-2">
-                    <label class="w-1/3">Giám định 2:</label>
-                    <input id="gd2Input" type="number" step="0.01" min="7.90" max="9.00" class="w-1/3 p-2 rounded bg-gray-600 text-lg font-bold text-yellow-300" placeholder="8.50">
-                    <button class="w-1/3 admin-button bg-red-600 text-white" data-judge="2">UP GĐ2</button>
-                </div>
-
-                <!-- GĐ3 -->
-                <div class="flex items-center space-x-2">
-                    <label class="w-1/3">Giám định 3:</label>
-                    <input id="gd3Input" type="number" step="0.01" min="7.90" max="9.00" class="w-1/3 p-2 rounded bg-gray-600 text-lg font-bold text-yellow-300" placeholder="8.50">
-                    <button class="w-1/3 admin-button bg-red-600 text-white" data-judge="3">UP GĐ3</button>
-                </div>
-            </div>
-            
-            <!-- 3. Nút Reset -->
-            <div class="pt-4 border-t border-gray-500">
-                <button id="btnReset" class="w-full admin-button bg-yellow-500 text-gray-900">RESET TOÀN BỘ ĐIỂM</button>
-            </div>
-            
-             <!-- Gỡ lỗi/Thông tin -->
-            <div class="text-xs text-gray-400">
-                <p>App ID: <span id="appIdDisplay">N/A</span></p>
-                <p>Vui lòng mở Console để xem thông báo lỗi nếu có.</p>
-            </div>
-
         </section>
 
     </div>
+    
+    <script type="module">
+        // --- CẤU HÌNH IMPORT THƯ VIỆN FIREBASE ---
+        // Sử dụng phiên bản 12.6.0
+        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        // Cần Realtime Database (rtdb) và Auth
+        import { getDatabase, ref, onValue, set, update, remove, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-    <!-- Tải file JavaScript dưới dạng module -->
-    <script type="module" src="script.js"></script>
+        // Bật log gỡ lỗi cho Firebase
+        setLogLevel('debug');
+
+        // ----------------------------------------------------
+        // CẤU HÌNH & THIẾT LẬP BAN ĐẦU
+        // ----------------------------------------------------
+        
+        let canvasAppId;
+        let firebaseConfig;
+        
+        // KIỂM TRA MÔI TRƯỜNG:
+        if (typeof __app_id === 'undefined' || typeof __firebase_config === 'undefined') {
+            console.log("Đang chạy trên môi trường LOCAL (Live Server). Sử dụng cấu hình Firebase cứng.");
+            
+            // =======================================================================
+            // *** CẤU HÌNH FIREBASE CỦA BẠN ĐÃ ĐƯỢC CẬP NHẬT LỖI RTDB URL ***
+            firebaseConfig = {
+                apiKey: "AIzaSyAwnuQ7R7yVrkqzgKASBdqgI3ZWK7yE4Mc",
+                authDomain: "thiquyen-f4a04.firebaseapp.com",
+                projectId: "thiquyen-f4a04",
+                storageBucket: "thiquyen-f4a04.firebasestorage.app",
+                messagingSenderId: "1060388640854",
+                appId: "1:1060388640854:web:46088ea942a6a6264d83f7",
+                measurementId: "G-CM3HNE44Z5",
+                // ĐÃ SỬA URL DỰA TRÊN CẢNH BÁO CONSOLE (ASIA-SOUTHEAST1)
+                databaseURL: "https://thiquyen-f4a04-default-rtdb.asia-southeast1.firebasedatabase.app" 
+            };
+            // =======================================================================
+
+            // Sử dụng ID mặc định cho môi trường cục bộ.
+            canvasAppId = 'local-vovinam-app-id'; 
+
+        } else {
+            // MÔI TRƯỜNG CANVAS (Hoạt động như bình thường)
+            canvasAppId = __app_id;
+            try {
+                firebaseConfig = JSON.parse(__firebase_config);
+            } catch (e) {
+                console.error("Lỗi: Không thể phân tích __firebase_config từ môi trường.", e);
+            }
+        }
+        
+        // FIX LỖI RTDB PATH: Thay thế dấu chấm bằng dấu gạch ngang
+        const safeAppId = canvasAppId.replace(/\./g, '-'); 
+        
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Các đường dẫn Realtime Database
+        // CHÚ Ý: Firestore path được mô phỏng trên Realtime DB
+        const formMatchRef = ref(db, `artifacts/${safeAppId}/public/data/poomsaeMatch`);
+        const formJudgeVotesRef = ref(db, `artifacts/${safeAppId}/public/data/poomsaeVotes`);
+
+        // STATE CỤC BỘ
+        let state = {
+            eventTitle: 'GIẢI VÔ ĐỊCH QUYỀN',
+            formName: 'Khởi Quyền',
+            athleteName: 'TÊN VĐV',
+            gd1Score: 0, 
+            gd2Score: 0,
+            gd3Score: 0,
+            totalScore: 0
+        };
+
+        // Khai báo biến global cho các phần tử DOM
+        let $ = {}; 
+
+        // ----------------------------------------------------
+        // CÁC HÀM TIỆN ÍCH
+        // ----------------------------------------------------
+
+        function formatScore(score) {
+            // Hiển thị '--' nếu điểm là 0, ngược lại hiển thị điểm nguyên
+            return score === 0 ? '--' : Math.round(score).toString(); 
+        }
+
+        function flashMessage(txt, isError = false) {
+            const el = document.createElement('div'); el.style.position='fixed'; el.style.left='50%'; el.style.top='18px'; el.style.transform='translateX(-50%)'; el.style.background=isError ? 'linear-gradient(90deg, #EF4444, #B91C1C)' : 'linear-gradient(90deg, #10B981, #059669)'; el.style.padding='10px 14px'; el.style.borderRadius='10px'; el.style.boxShadow='0 12px 40px rgba(0,0,0,0.6)'; el.style.zIndex=9999; el.style.color='#fff'; el.style.opacity='0'; el.style.transition='opacity .16s ease'; el.innerText = txt; document.body.appendChild(el); requestAnimationFrame(()=>el.style.opacity=1); setTimeout(()=>{ el.style.opacity=0; setTimeout(()=>el.remove(),300); },2000);
+        }
+
+        // ----------------------------------------------------
+        // CẬP NHẬT GIAO DIỆN & FIREBASE ACTIONS
+        // ----------------------------------------------------
+
+        /** Cập nhật giao diện dựa trên trạng thái (state) cục bộ */
+        function updateDisplay() {
+            if ($.gd1ScoreDisplay) $.gd1ScoreDisplay.innerText = formatScore(state.gd1Score);
+            if ($.gd2ScoreDisplay) $.gd2ScoreDisplay.innerText = formatScore(state.gd2Score);
+            if ($.gd3ScoreDisplay) $.gd3ScoreDisplay.innerText = formatScore(state.gd3Score);
+            if ($.totalScoreDisplay) $.totalScoreDisplay.innerText = formatScore(state.totalScore);
+            
+            if ($.eventTitle) $.eventTitle.innerText = state.eventTitle || 'TÊN GIẢI ĐẤU';
+            if ($.formNameDisplay) $.formNameDisplay.innerText = `Nội Dung: ${state.formName}`;
+            if ($.athleteNameDisplay) $.athleteNameDisplay.innerText = state.athleteName || 'TÊN VĐV';
+            
+            // Đồng bộ trạng thái nút bấm nội dung
+            [$.btnKhoiQuyen, $.btnThapTuQuyen].forEach(btn => {
+                if (!btn) return;
+                const isActive = btn.getAttribute('data-form') === state.formName;
+                btn.classList.toggle('bg-green-600', isActive);
+                btn.classList.toggle('bg-gray-500', !isActive);
+                btn.classList.toggle('hover:bg-green-700', isActive);
+                btn.classList.toggle('hover:bg-gray-600', !isActive);
+            });
+        }
+
+        /** Cập nhật một khóa duy nhất trong match state (Admin controls) */
+        async function setMatchKey(key, val) {
+            if (!auth.currentUser) {
+                flashMessage("Lỗi: Chưa xác thực, không thể gửi dữ liệu.", true);
+                return console.warn("Lỗi: Chưa xác thực, không thể gửi dữ liệu.");
+            }
+            try {
+                // Ghi đè chỉ một key (Title, Name, Form Name)
+                await set(ref(db, `artifacts/${safeAppId}/public/data/poomsaeMatch/${key}`), val);
+                flashMessage(`Đã cập nhật ${key}.`);
+            } catch(e) {
+                console.error("Lỗi cập nhật match key:", e);
+                flashMessage("Lỗi cập nhật cấu hình.", true);
+            }
+        }
+
+        /** Admin nhập điểm và bấm nút gửi cho Giám định tương ứng */
+        async function submitJudgeScore(judgeId) {
+            if (!auth.currentUser) {
+                flashMessage("Lỗi: Chưa xác thực, không thể gửi điểm.", true);
+                return console.warn("Lỗi: Chưa xác thực, không thể gửi điểm.");
+            }
+            
+            const inputEl = document.getElementById(`gd${judgeId}Input`);
+            if (!inputEl) return console.error(`Không tìm thấy input cho GĐ${judgeId}`);
+            
+            let score = parseFloat(inputEl.value);
+
+            // Giới hạn điểm từ 79 đến 100
+            if (isNaN(score) || score < 79 || score > 100) {
+                flashMessage(`Điểm GĐ${judgeId} không hợp lệ. (79 - 100)`, true);
+                return;
+            }
+            
+            const voteData = {
+                // Điểm làm tròn thành số nguyên
+                score: Math.round(score),
+                timestamp: Date.now()
+            };
+            
+            try {
+                // Ghi đè điểm mới nhất của Giám định này
+                await set(ref(db, `artifacts/${safeAppId}/public/data/poomsaeVotes/gd${judgeId}`), voteData);
+                flashMessage(`Đã gửi điểm GĐ${judgeId}: ${Math.round(score)}`);
+                
+                inputEl.value = ''; // Xóa input sau khi gửi
+            } catch (e) {
+                console.error("Lỗi gửi điểm GĐ:", e);
+                flashMessage(`Lỗi gửi điểm GĐ${judgeId}.`, true);
+            }
+        }
+
+        /** Reset toàn bộ điểm (match state và votes) */
+        async function resetForm() {
+            if (!auth.currentUser) {
+                flashMessage("Lỗi: Chưa xác thực, không thể reset.", true);
+                return console.warn("Lỗi: Chưa xác thực, không thể reset.");
+            }
+            
+            try {
+                // 1. Reset trạng thái chính về 0 (duy trì tên giải và tên quyền)
+                await set(formMatchRef, {
+                    eventTitle: state.eventTitle,
+                    formName: state.formName,
+                    athleteName: state.athleteName,
+                    gd1Score: 0,
+                    gd2Score: 0,
+                    gd3Score: 0,
+                    totalScore: 0
+                });
+                // 2. Xóa tất cả Votes tạm thời 
+                await remove(formJudgeVotesRef);
+                flashMessage("Đã reset điểm Quyền về 0.");
+            } catch(e) {
+                console.error("Lỗi reset:", e);
+                flashMessage("Lỗi khi reset điểm.", true);
+            }
+        }
+
+        // ----------------------------------------------------
+        // FIREBASE LISTENERS (Đồng bộ Real-time)
+        // ----------------------------------------------------
+
+        /** Listener 1: Đồng bộ trạng thái chính (Score, Title, Name) */
+        function setupMatchStatusListener() {
+            // Lắng nghe thay đổi trên node poomsaeMatch
+            onValue(formMatchRef, (snapshot) => {
+                const data = snapshot.val() || {};
+                
+                // Cập nhật state cục bộ
+                state.eventTitle = data.eventTitle || state.eventTitle;
+                state.formName = data.formName || state.formName;
+                state.athleteName = data.athleteName || state.athleteName;
+                state.gd1Score = parseInt(data.gd1Score || 0);
+                state.gd2Score = parseInt(data.gd2Score || 0);
+                state.gd3Score = parseInt(data.gd3Score || 0);
+                state.totalScore = parseInt(data.totalScore || 0);
+                
+                // Đồng bộ inputs Admin
+                if ($.tournamentNameInput) $.tournamentNameInput.value = state.eventTitle;
+                if ($.athleteNameInput) $.athleteNameInput.value = state.athleteName;
+                
+                updateDisplay();
+            });
+        }
+
+        /** Listener 2: Xử lý Votes từ Giám định và Cập nhật Tổng điểm */
+        function setupJudgeVotesListener() {
+            // Lắng nghe thay đổi trên node poomsaeVotes
+            onValue(formJudgeVotesRef, (snapshot) => {
+                const votes = snapshot.val() || {};
+                let scoreUpdate = {};
+                
+                // Lấy điểm mới nhất từ votes
+                const gd1 = votes.gd1 ? parseInt(votes.gd1.score) : state.gd1Score;
+                const gd2 = votes.gd2 ? parseInt(votes.gd2.score) : state.gd2Score;
+                const gd3 = votes.gd3 ? parseInt(votes.gd3.score) : state.gd3Score;
+                
+                // Tính tổng điểm
+                const total = gd1 + gd2 + gd3; 
+                
+                // Chuẩn bị cập nhật nếu có thay đổi
+                if (gd1 !== state.gd1Score) scoreUpdate.gd1Score = gd1;
+                if (gd2 !== state.gd2Score) scoreUpdate.gd2Score = gd2;
+                if (gd3 !== state.gd3Score) scoreUpdate.gd3Score = gd3;
+                
+                if (Object.keys(scoreUpdate).length > 0 || total !== state.totalScore) {
+                    scoreUpdate.totalScore = total;
+                    
+                    // Cập nhật atomic các điểm và tổng điểm vào bảng điểm chính
+                    if (Object.keys(scoreUpdate).length > 0) {
+                         update(formMatchRef, scoreUpdate).catch(e => console.error("Lỗi cập nhật điểm:", e));
+                    }
+                }
+            });
+        }
+
+        // ----------------------------------------------------
+        // HÀM KHỞI TẠO CHÍNH
+        // ----------------------------------------------------
+
+        async function initialize() {
+            // BƯỚC 1: Lấy tất cả DOM Elements
+            $ = {
+                eventTitle: document.getElementById('eventTitle'),
+                formNameDisplay: document.getElementById('formNameDisplay'),
+                athleteNameDisplay: document.getElementById('athleteNameDisplay'),
+                totalScoreDisplay: document.getElementById('totalScoreDisplay'),
+                gd1ScoreDisplay: document.getElementById('gd1ScoreDisplay'),
+                gd2ScoreDisplay: document.getElementById('gd2ScoreDisplay'),
+                gd3ScoreDisplay: document.getElementById('gd3ScoreDisplay'),
+                tournamentNameInput: document.getElementById('tournamentName'),
+                athleteNameInput: document.getElementById('athleteNameInput'),
+                btnKhoiQuyen: document.getElementById('btnKhoiQuyen'),
+                btnThapTuQuyen: document.getElementById('btnThapTuQuyen'),
+                btnReset: document.getElementById('btnReset'),
+                judgeButtons: document.querySelectorAll('.btn-submit'),
+                btnFullscreenControl: document.getElementById('btnFullscreenControl'),
+                gd1Input: document.getElementById('gd1Input'),
+                gd2Input: document.getElementById('gd2Input'),
+                gd3Input: document.getElementById('gd3Input'),
+            };
+            
+            // BƯỚC 2: Xác thực Firebase (Yêu cầu phải bật Anonymous Auth trong console)
+            try {
+                // Trong môi trường Local, nó sẽ dùng signInAnonymously
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                console.log("Xác thực Firebase thành công. User ID:", auth.currentUser?.uid || 'Anonymous');
+                flashMessage("Kết nối Firebase thành công!");
+            } catch (error) {
+                console.error("Lỗi xác thực Firebase:", error);
+                flashMessage("LỖI XÁC THỰC! Vui lòng bật Anonymous Sign-in trong Firebase Console.", true);
+            }
+            
+            if (document.getElementById('appIdDisplay')) document.getElementById('appIdDisplay').innerText = safeAppId;
+            
+            // BƯỚC 3: Đảm bảo dữ liệu mặc định có trong DB
+            try {
+                const snapshot = await get(formMatchRef); 
+                if (!snapshot.exists()) {
+                    console.log("Khởi tạo dữ liệu bảng điểm mặc định...");
+                    // Chỉ khởi tạo dữ liệu mặc định nếu chưa tồn tại
+                    await set(formMatchRef, state);
+                }
+            } catch (e) {
+                console.error("Lỗi kiểm tra/khởi tạo dữ liệu Firebase:", e);
+                // Lỗi này thường do Rules chưa cho phép ghi
+                flashMessage("LỖI KẾT NỐI DB. Kiểm tra Quy tắc Bảo mật RTDB.", true);
+            }
+            
+            
+            // BƯỚC 4: Gắn Event Listeners 
+            
+            // Cấu hình Admin
+            $.tournamentNameInput?.addEventListener('input', (e) => setMatchKey('eventTitle', e.target.value));
+            $.athleteNameInput?.addEventListener('input', (e) => setMatchKey('athleteName', e.target.value));
+            $.btnKhoiQuyen?.addEventListener('click', (e) => setMatchKey('formName', e.target.getAttribute('data-form')));
+            $.btnThapTuQuyen?.addEventListener('click', (e) => setMatchKey('formName', e.target.getAttribute('data-form')));
+            $.btnReset?.addEventListener('click', resetForm);
+            
+            // Logic Gửi Điểm 
+            $.judgeButtons?.forEach(button => {
+                button.addEventListener('click', () => {
+                    const judgeId = parseInt(button.getAttribute('data-judge'));
+                    submitJudgeScore(judgeId);
+                });
+            });
+            
+            // Fullscreen
+            $.btnFullscreenControl?.addEventListener('click', () => {
+                const el = document.getElementById('displaySection');
+                if (!document.fullscreenElement) {
+                    el.requestFullscreen && el.requestFullscreen().catch(err => {
+                        flashMessage(`Lỗi Fullscreen: ${err.message}`, true);
+                    });
+                }
+                else document.exitFullscreen && document.exitFullscreen();
+            });
+            
+            // BƯỚC 5: Setup Listeners Firebase
+            setupMatchStatusListener();
+            setupJudgeVotesListener();
+            
+            updateDisplay();
+            console.log("Hệ thống bảng điểm Quyền Vovinam đã sẵn sàng.");
+        }
+
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
 </body>
 </html>
